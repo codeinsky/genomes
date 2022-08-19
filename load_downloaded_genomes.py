@@ -3,6 +3,7 @@ import os
 
 def load_downloaded_genomes():
     res_archives = []
+    genomes = []
     # Collects all files with .gz extension
     for root, dirs, files in os.walk("./refseq"):
         for file in files:
@@ -12,5 +13,4 @@ def load_downloaded_genomes():
     if len(res_archives) > 0:
 
         genomes = [gen.split("/")[-1] for gen in res_archives]
-        print(genomes)
     return genomes

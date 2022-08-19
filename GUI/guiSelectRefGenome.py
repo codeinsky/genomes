@@ -33,6 +33,8 @@ def selectRefGenomes(top_window):
     tkinter.Button(ref_button_frame, text="Remove", command=selectRefGenomes).grid(row=0, column=0)
     tkinter.Button(ref_button_frame, text="Update", command=update_downloaded_genomes).grid(row=0, column=1)
 
+    # Update downloaded genomes from local
+    update_downloaded_genomes()
     # Download table
     download_genome_frame = tkinter.Frame(select_win, borderwidth=10, highlightbackground="black", highlightthickness=1)
     download_genome_frame.grid(row=0, column=1, sticky="N", pady=10, padx=10)
@@ -54,7 +56,8 @@ def selectRefGenomes(top_window):
     ref_button_frame.grid(row=4, column=0)
 
     # Buttons
-    tkinter.Button(ref_button_frame, text="Download", command=downloads_checked).grid(row=1, column=1)
+    tkinter.Button(ref_button_frame, text="Download", command=downloads_checked).grid(row=1, column=0)
+    tkinter.Button(ref_button_frame, text="Collapse", command=collapse).grid(row=1, column=1)
     global search_entry_query
     search_entry_query = tkinter.Entry(ref_button_frame)
     search_entry_query.grid(row=0, column=1)
@@ -74,17 +77,24 @@ def selectRefGenomes(top_window):
             tree_ref_sql.insert(index, "end", str(index) + str(i), text=row['id'], values=(row['number'], row['desc']))
 
 
+def collapse():
+    tree_ref_sql.collapse_all()
 
 
 def downloads_checked():
     item_list_checked = tree_ref_sql.get_checked()
     item_list = list(set(item_list_checked))
+    genomes_ids_to_download = []
     for item in item_list:
         genome = tree_ref_sql.item(item)
         genome_id = genome['text']
-        print(genome_id)
-        downlaod_genome.download_genome(genome_id)
+        genomes_ids_to_download.append(genome_id)
+    genomes_ids_to_download = list(set(genomes_ids_to_download))
+    print(genomes_ids_to_download)
+    for genome_id_to_download in genomes_ids_to_download:
+        downlaod_genome.download_genome(genome_id_to_download)
     unzip_downloads.unzip()
+    update_downloaded_genomes()
 
 
 def update_downloaded_genomes():
@@ -106,7 +116,7 @@ def search_genomes():
             values = tree_ref_sql.item(child)['values']
             if len(key_query) > 0:
                 if key_query in str(values[1]) or key_query == str(genome_id):
-                    print("Tree id:", tree_item_id, "Genome id:", genome_id, "Values", values)
+                    # print("Tree id:", tree_item_id, "Genome id:", genome_id, "Values", values)
                     tree_view_search_sub.insert("", "end", str(i), text=genome_id, values=(values[0], values[1]))
                     i += 1
 
@@ -115,7 +125,7 @@ def search_genome_list():
     search_win = Toplevel(select_win)
     search_win.title("Search genome")
     search_win.geometry("800x350")
-    Button(search_win, text="Apply", command=search_genomes).grid(row=2, column=3, pady=5)
+    Button(search_win, text="Apply", command=check_searched_items).grid(row=2, column=3, pady=5)
     Button(search_win, text="Close", command=search_win.destroy).grid(row=2, column=4, pady=5)
     global tree_view_search_sub
     tree_view_search_sub = CheckboxTreeview(search_win, column=("1", "2"), show=("headings", "tree"))
@@ -127,6 +137,35 @@ def search_genome_list():
     tree_view_search_sub.heading("2", text="Description")
     tree_view_search_sub.column("2", width=400)
     search_genomes()
+
+
+def check_searched_items():
+    checked_searched_ids = []
+    checked_search_items = tree_view_search_sub.get_checked()
+    # gets all checked searched items
+    if len(checked_search_items) > 0:
+        for item_id in checked_search_items:
+            checked_searched_ids.append(tree_view_search_sub.item(item_id)['text'])
+    #           checks all searched items general list
+    print(checked_searched_ids)
+    check_items_per_id(checked_searched_ids)
+
+
+def check_items_per_id(checked_ids):
+    for id in checked_ids:
+        for items in tree_ref_sql.get_children():
+            child_list = tree_ref_sql.get_children(items)
+            for child in child_list:
+                tree_item_id = child
+                genome_id = tree_ref_sql.item(child)['text']
+                values = tree_ref_sql.item(child)['values']
+                if genome_id == id:
+                    # print("Found item")
+                    # print(child)
+                    # print(tree_ref_sql.item(child))
+                    tree_ref_sql.change_state(child, "checked")
+                    tree_ref_sql.change_state(items, "checked")
+
 
 # top_test = tkinter.Tk()
 #
