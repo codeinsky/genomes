@@ -3,9 +3,10 @@ from ttkwidgets import CheckboxTreeview
 from tkinter import filedialog
 import guiSelectRefGenome
 import load_downloaded_genomes
+import scanning_genomes
 
 top = tkinter.Tk()
-top.geometry('1100x400')
+top.geometry('900x500')
 
 
 def browsefunc():
@@ -29,6 +30,20 @@ def update_ref_genomes():
     for index, item in enumerate(local_items):
         treeRef.insert("", "end", index, text=index, values=(item, "comment"))
     print("updating data")
+
+
+def start_scan():
+    # check if ref. genomes and probe is correct
+    if "fasta" in file_path.cget("text") and len(treeRef.get_checked()) > 0:
+        print("ready to start")
+        genomes_ids = treeRef.get_checked()
+        probe_path = (file_path.cget("text"))
+        ref_genomes = []
+        for id in genomes_ids:
+            ref_genomes.append(treeRef.item(id)['values'][0])
+        scanning_genomes.scan_genomes(ref_genomes, probe_path)
+    else:
+        print("Please select data or probe file")
 
 
 #  Genome frame
@@ -61,9 +76,10 @@ tkinter.Button(ref_button_frame, text="Refresh", command=update_ref_genomes).gri
 # Load probe frame
 # **********************
 probe_frame = tkinter.Frame(top, borderwidth=5, highlightbackground="black", highlightthickness=1)
-probe_frame.grid(row=0, column=2, sticky="N", pady=10, padx=10)
+probe_frame.grid(row=2, column=0, sticky="N", pady=10, padx=10)
 tkinter.Label(probe_frame, text="Probe fasta file:").grid(row=0, column=0)
-file_path = tkinter.Label(probe_frame, text="c:fasta.fa")
+global file_path
+file_path = tkinter.Label(probe_frame, text="")
 file_path.grid(row=0, column=1)
 probe_frame_button = tkinter.Frame(probe_frame)
 probe_frame_button.grid(row=1, column=0)
@@ -74,7 +90,7 @@ tkinter.Button(probe_frame_button, text="Remove", command=removeLoadedProbe).gri
 
 frame_btn_str = tkinter.Frame(top)
 frame_btn_str.grid(row=0, column=1)
-tkinter.Button(frame_btn_str, text="Start", command=None).grid(row=0, column=0)
+tkinter.Button(frame_btn_str, text="Start", command=start_scan).grid(row=0, column=0)
 tkinter.Button(frame_btn_str, text="Stop", command=None).grid(row=0, column=1)
 tkinter.Button(frame_btn_str, text="Exit", command=top.destroy).grid(row=0, column=2)
 
