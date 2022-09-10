@@ -2,8 +2,10 @@ import tkinter
 from ttkwidgets import CheckboxTreeview
 from tkinter import filedialog
 import guiSelectRefGenome
+import load_downloaded_genomes
+
 top = tkinter.Tk()
-top.geometry('1000x400')
+top.geometry('1100x400')
 
 
 def browsefunc():
@@ -20,24 +22,41 @@ def selectRefGenomes():
     guiSelectRefGenome.selectRefGenomes(top)
 
 
+def update_ref_genomes():
+    print("updating data")
+    treeRef.delete(*treeRef.get_children())
+    local_items = load_downloaded_genomes.load_downloaded_genomes()
+    for index, item in enumerate(local_items):
+        treeRef.insert("", "end", index, text=index, values=(item, "comment"))
+    print("updating data")
+
+
 #  Genome frame
 # *********************************************
 genome_frame = tkinter.Frame(top, borderwidth=5, highlightbackground="black", highlightthickness=1)
 genome_frame.grid(row=0, column=0, sticky="N", pady=10, padx=10)
 tkinter.Label(genome_frame, text="Reference genome list").grid(row=2, column=0)
+global treeRef
 treeRef = CheckboxTreeview(genome_frame, column=("1", "2"), show=("headings", "tree"))
+treeRef.heading("#0", text="GenomeID")
+treeRef.column("#0", minwidth=0, width=80)
 treeRef.grid(row=3, column=0)
 treeRef.heading("1", text="Name")
-treeRef.heading("2", text="Comment")
-treeRef.insert("", "end", "1", text="1")
-treeRef.insert("", "end", "2", text="2")
+treeRef.column("1", width=400)
+treeRef.heading("2", text="Desc")
+treeRef.column("2", width=100)
+sb = tkinter.Scrollbar(genome_frame, orient="vertical", command=treeRef.yview)
+sb.grid(row=3, column=5)
+treeRef.configure(yscrollcommand=sb.set)
 
+update_ref_genomes()
 ref_button_frame = tkinter.Frame(genome_frame)
 ref_button_frame.grid(row=4, column=0)
 
 # Buttons
 tkinter.Button(ref_button_frame, text="Add", command=selectRefGenomes).grid(row=0, column=0)
 tkinter.Button(ref_button_frame, text="Remove", command=None).grid(row=0, column=1)
+tkinter.Button(ref_button_frame, text="Refresh", command=update_ref_genomes).grid(row=0, column=3)
 
 # Load probe frame
 # **********************
@@ -57,5 +76,6 @@ frame_btn_str = tkinter.Frame(top)
 frame_btn_str.grid(row=0, column=1)
 tkinter.Button(frame_btn_str, text="Start", command=None).grid(row=0, column=0)
 tkinter.Button(frame_btn_str, text="Stop", command=None).grid(row=0, column=1)
+tkinter.Button(frame_btn_str, text="Exit", command=top.destroy).grid(row=0, column=2)
 
 top.mainloop()
