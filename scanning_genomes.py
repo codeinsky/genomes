@@ -11,16 +11,22 @@ def scan_genomes(ref_genomes, probe):
     references_genomes_files = load_genomes_paths(ref_genomes)
     # Loop over probes
     for index, record in enumerate(prob_seq):
+        # loop over reference
         for key, value in references_genomes_files.items():
             print("Probe description", record.description)
             print("Probe seq", record.seq)
             print("Reference:", key)
-            print("Path", value)
+            # print("Path", value)
             ref_seq = SeqIO.parse(value, 'fasta')
             print("Reference genome")
-            for ref_record in ref_seq:
+            for i, ref_record in enumerate(ref_seq):
                 print(ref_record.id)
-        if index == 0:
+                if str(record.seq) in str(ref_record.seq).upper():
+                    print("Found:", ref_record.id)
+                    break
+
+
+        if index == 1:
             break
 
 
