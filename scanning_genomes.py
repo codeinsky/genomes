@@ -1,5 +1,7 @@
 from Bio import SeqIO
 import os
+import sqlExe
+import gc
 
 
 def scan_genomes(ref_genomes, probe):
@@ -9,10 +11,17 @@ def scan_genomes(ref_genomes, probe):
     prob_seq = SeqIO.parse(probe, 'fasta')
     # Loading references
     references_genomes_files = load_genomes_paths(ref_genomes)
+    # create mapping table
+    sqlExe.create_mapping_table(probe)
     # Loop over probes
     for index, record in enumerate(prob_seq):
+        flag_found = False
         # loop over reference
-        for key, value in references_genomes_files.items():
+        for index_ref, (key, value) in enumerate(references_genomes_files.items()):
+            if flag_found:
+                break
+            #  creates SQL column column for reference genome
+            sqlExe.create_column_mapping(probe, key)
             print("Probe description", record.description)
             print("Probe seq", record.seq)
             print("Reference:", key)
@@ -23,11 +32,14 @@ def scan_genomes(ref_genomes, probe):
                 print(ref_record.id)
                 if str(record.seq) in str(ref_record.seq).upper():
                     print("Found:", ref_record.id)
+                    sqlExe.add_record_to_mapping(probe, key, record.id, record.name, record.description, record.seq,
+                                                 ref_record.id)
+                    flag_found = True
                     break
-
-
-        if index == 1:
+            print(index_ref, " of ", len(references_genomes_files))
+        if index == 2:
             break
+        gc.collect()
 
 
 def load_genomes_paths(ref_genomes):

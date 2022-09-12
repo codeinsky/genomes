@@ -9,13 +9,16 @@ connection = psycopg2.connect(user="genome",
 
 
 def create_mapping_table(table_name):
+    print('Creating table:', table_name )
     if '/' in table_name:
         table_details_list = table_name.split('/')
-        table_name = table_details_list[2]
+        table_name = table_details_list[-1]
+    if '.' in table_name:
+        table_name = table_name.replace('.', '_')
     else:
         table_name = table_name
     cursor = connection.cursor()
-    query = (queries.create_table_mapping % (table_name + '__probe_mapping'))
+    query = (queries.create_table_mapping % table_name)
     cursor.execute(query)
     connection.commit()
     # print("Table created:", table_name)
@@ -24,9 +27,12 @@ def create_mapping_table(table_name):
 def create_column_mapping(table_name, column_name):
     if '/' in table_name:
         table_details_list = table_name.split('/')
-        table_name = table_details_list[2] + '__probe_mapping'
+        table_name = table_details_list[-1]
+    if '.' in table_name:
+        table_name = table_name.replace('.', '_')
     else:
-        table_name = table_name + '__probe_mapping'
+        table_name = table_name
+    column_name = column_name.replace('.', '_').replace('-','_')
     query = (queries.add_column % (table_name, column_name))
     cursor = connection.cursor()
     try:
@@ -40,10 +46,12 @@ def create_column_mapping(table_name, column_name):
 def add_record_to_mapping(table_name, id, name, description, seq, column_name, column_value):
     if '/' in table_name:
         table_details_list = table_name.split('/')
-        table_name = table_details_list[2] + '__probe_mapping'
+        table_name = table_details_list[-1]
+    if '.' in table_name:
+        table_name = table_name.replace('.', '_')
     else:
         table_name = table_name
-    query = (queries.insert_row_mapping % (table_name, id, name, description, seq, column_name, column_value))
+    query = (queries.insert_row_mapping % (table_name, id.replace('.', '_').replace('-','_'), name, description, seq, column_name, column_value))
     cursor = connection.cursor()
     try:
         cursor.execute(query)

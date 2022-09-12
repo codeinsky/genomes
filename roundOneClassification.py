@@ -24,7 +24,7 @@ def round_one_classification(probe, references):
             reference_sequences.sort()
             #  adds column with name of the genome Name reference
             sqlExe.create_column_mapping(probe, key)
-            print("References paths",reference_sequences)
+            print("References paths", reference_sequences)
             for ref_seq in reference_sequences:
                 # print("Reference path:", ref_seq)
                 ref_seq_fasta = SeqIO.parse(ref_seq, 'fasta')
