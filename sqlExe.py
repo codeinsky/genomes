@@ -52,6 +52,7 @@ def add_record_to_mapping(table_name, id, name, description, seq, column_name, c
     else:
         table_name = table_name
     query = (queries.insert_row_mapping % (table_name, id.replace('.', '_').replace('-','_'), name, description, seq, column_name, column_value))
+    print(query)
     cursor = connection.cursor()
     try:
         cursor.execute(query)
@@ -70,7 +71,6 @@ def add_existing_row_record_to_mapping(table_name, id, name, description, seq, c
     else:
         table_name = table_name
     query = queries.add_value_where_condition % (table_name, id, column_value, 'id', name)
-    print(query)
     cursor = connection.cursor()
     try:
         cursor.execute(query)

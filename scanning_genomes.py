@@ -37,7 +37,13 @@ def scan_genomes(ref_genomes, probe):
                     flag_found = True
                     break
             print(index_ref, " of ", len(references_genomes_files))
-        if index == 2:
+            # record checked for all references and not found
+            if index_ref == len(references_genomes_files) - 1:
+                sqlExe.add_record_to_mapping(probe, key, record.id, record.name, record.description, record.seq,
+                                             '')
+                print('Not Found')
+
+        if index == 100:
             break
         gc.collect()
 
