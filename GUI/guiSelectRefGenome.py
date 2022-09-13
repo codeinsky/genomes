@@ -2,9 +2,7 @@ import tkinter
 from tkinter import *
 from ttkwidgets import CheckboxTreeview
 import loadAllGenomesIdsFromSQL
-from tkinter import filedialog
-import downlaod_genome
-import unzip_downloads
+from DownloadUnzipManage import downlaod_genome, unzip_downloads
 import load_downloaded_genomes
 
 

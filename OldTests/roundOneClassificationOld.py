@@ -1,5 +1,5 @@
 from Bio import SeqIO
-import sqlExe
+from SQLexe import sqlExe
 import gc
 
 
@@ -55,10 +55,10 @@ def round_one_classification(probe, references):
                 if found_flag:
                     if record.id in not_found_records:
                         sqlExe.add_existing_row_record_to_mapping(probe, key, record.id, record.name, record.description,
-                                                                  record.seq, str(ref_seq_fasta_record.id) + ' '+ ref_seq)
+                                                                  record.seq, str(ref_seq_fasta_record.id) + ' ' + ref_seq)
                     else:
                         sqlExe.add_record_to_mapping(probe, key, record.id, record.name, record.description, record.seq,
-                                                 str(ref_seq_fasta_record.id) + ' ' + ref_seq)
+                                                     str(ref_seq_fasta_record.id) + ' ' + ref_seq)
                     found_records.append(record.id)
                     del ref_seq_fasta
                     gc.collect()

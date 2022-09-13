@@ -51,7 +51,7 @@ def add_record_to_mapping(table_name, id, name, description, seq, column_name, c
         table_name = table_name.replace('.', '_')
     else:
         table_name = table_name
-    query = (queries.insert_row_mapping % (table_name, id.replace('.', '_').replace('-','_'), name, description, seq, column_name, column_value))
+    query = (queries.insert_row_mapping % (table_name, id.replace('.', '_').replace('-', '_'), name, description, seq, column_name, column_value))
     print(query)
     cursor = connection.cursor()
     try:

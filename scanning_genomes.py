@@ -1,6 +1,6 @@
 from Bio import SeqIO
 import os
-import sqlExe
+from SQLexe import sqlExe
 import gc
 
 
